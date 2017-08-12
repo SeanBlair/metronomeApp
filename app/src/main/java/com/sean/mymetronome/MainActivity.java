@@ -8,7 +8,10 @@ import android.widget.TextView;
 
 public class MainActivity extends AppCompatActivity {
 
+    // Number of 100 ms silences to play between 100 ms click.
     private int silencesToRepeat = 2;
+    // True when Start pressed, false when Stop pressed.
+    boolean isClickOn;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -19,20 +22,26 @@ public class MainActivity extends AppCompatActivity {
     /** Called when user taps start **/
     public void start(View view) {
         setStatusText("Start button pressed.");
-        startClick();
+        if (!isClickOn) {
+            startClick();
+        }
     }
 
     /** Called when user taps stop **/
     public void stop(View view) {
         setStatusText("Stop button pressed.");
+        isClickOn = false;
     }
 
+    /** Sets the text message used to debug **/
     private void setStatusText(String str) {
         TextView statusTextView = (TextView) findViewById(R.id.statusText);
         statusTextView.setText(str);
     }
 
+    /** Starts the metronome logic  TODO refactor for clarity...**/
     private void startClick() {
+        isClickOn = true;
         Thread mThread = new Thread(new Runnable() {
             public void run() {
                 final MediaPlayer click = MediaPlayer.create(getApplicationContext(), R.raw.click100msloud);
@@ -52,7 +61,9 @@ public class MainActivity extends AppCompatActivity {
                             silence.start();
                         } else {
                             numSilences[0] = silencesToRepeat;
-                            click.start();
+                            if (isClickOn) {
+                                click.start();
+                            }
                         }
                     }
                 });
